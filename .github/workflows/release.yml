@@ -12,8 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+
       - name: Install dependencies
         run: npm install
+        working-directory: ./path/to/your/package
 
       - name: Determine version bump
         id: determine_bump
@@ -33,7 +39,9 @@ jobs:
         run: |
           BUMP_TYPE=$(echo "${{ steps.determine_bump.outputs.stdout }}")
           npm version $BUMP_TYPE -m "Bump version to %s"
+        working-directory: ./path/to/your/package
 
       - name: Push changes
         run: |
           git push origin HEAD:${{ env.DEFAULT_BRANCH }}
+        working-directory: ./path/to/your/package
