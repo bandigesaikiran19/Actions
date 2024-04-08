@@ -1,39 +1,39 @@
-name: Semantic Versioning and Build
+name: Semantic Versioning and Release
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: npm install || yarn install
+        run: npm install
 
-      - name: Run standard-version
-        run: npx standard-version --release-as $(git log --format=%B -n 1 HEAD | grep -o '\[major\|\minor\|\patch\]') --dry-run1  
+      - name: Determine version bump
+        id: determine_bump
+        run: |
+          COMMIT_MSG=$(git log --format=%B -n 1 HEAD)
+          if [[ $COMMIT_MSG == *"[major]"* ]]; then
+            echo "major"
+          elif [[ $COMMIT_MSG == *"[minor]"* ]]; then
+            echo "minor"
+          else
+            echo "patch"
+          fi
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
-      - name: Semantic Release
-        uses: semantic-release/action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate build metadata
-        if: always() # Run this step always, regardless of previous steps' outcomes
-        run: echo "## Build ${{ github.run_id }}" >> $GITHUB_EVENT_NAME.log
+      - name: Bump version
+        run: |
+          BUMP_TYPE=$(echo "${{ steps.determine_bump.outputs.stdout }}")
+          npm version $BUMP_TYPE -m "Bump version to %s"
 
       - name: Push changes
-        if: always() && steps.semantic_release.outputs.published == 'true'
         run: |
-          git config --global user.email "github-actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add .
-          git commit -m "Bump version"
-          git push origin HEAD:main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push origin HEAD:${{ env.DEFAULT_BRANCH }}
