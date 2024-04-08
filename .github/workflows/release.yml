@@ -9,34 +9,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Install dependencies (adjust if needed)
-        run: npm install || yarn install  # Adjust for your package manager
+      - name: Install dependencies
+        run: npm install || yarn install
 
       - name: Get current version
         id: get_version
-        run: echo ::set-output name=VERSION ::$(npm version --parse patch)  # Adjust for your package manager
+        run: echo ::set-output name=VERSION::$(npm version --parse patch)
 
-      - name: Bump version (adjust based on your needs)
+      - name: Bump version
         uses: gr2m/semantic-release@v1
         with:
-          assets: [ package.json ]  # Files to update with the new version
-          release: { major: { regex: Major Bump! }, minor: { regex: Minor Bump! }, patch: true }
+          assets: package.json
+          release: major,minor,patch
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Access token with push permissions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate build metadata (optional)
+      - name: Generate build metadata
+        if: always() # Run this step always, regardless of previous steps' outcomes
         run: echo "## Build ${{ github.run_id }}" >> $GITHUB_EVENT_NAME.log
 
-      - name: Push changes (if version changed)
+      - name: Push changes
+        if: steps.get_version.outputs.VERSION != steps.get_version.outputs.VERSION
         run: |
-          if [[ "${{ steps.get_version.outputs.VERSION }}" != $(git describe --abbrev=0 --tags) ]]; then
-            git config --global user.email "github-actions@github.com"
-            git config --global user.name "GitHub Actions"
-            git add .
-            git commit -m "Bump version to ${{ steps.get_version.outputs.VERSION }}"
-            git push origin HEAD:main
-          fi
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add .
+          git commit -m "Bump version to ${{ steps.get_version.outputs.VERSION }}"
+          git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
