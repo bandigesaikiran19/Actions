@@ -41,7 +41,7 @@ jobs:
       #     npm version $BUMP_TYPE -m "Bump version to %s"
       #   working-directory: ./path/to/your/package
 
-      - name: Push changes
-        run: |
-          git push origin HEAD:${{ env.DEFAULT_BRANCH }}
-        working-directory: ./path/to/your/package
+      # - name: Push changes
+      #   run: |
+      #     git push origin HEAD:${{ env.DEFAULT_BRANCH }}
+      #   working-directory: ./path/to/your/package
