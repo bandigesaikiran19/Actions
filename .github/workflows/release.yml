@@ -21,17 +21,17 @@ jobs:
       #   run: npm install
       #   working-directory: ./path/to/your/package
 
-      - name: Determine version bump
-        id: determine_bump
-        run: |
-          COMMIT_MSG=$(git log --format=%B -n 1 HEAD)
-          if [[ $COMMIT_MSG == *"[major]"* ]]; then
-            echo "major"
-          elif [[ $COMMIT_MSG == *"[minor]"* ]]; then
-            echo "minor"
-          else
-            echo "patch"
-          fi
+      # - name: Determine version bump
+      #   id: determine_bump
+      #   run: |
+      #     COMMIT_MSG=$(git log --format=%B -n 1 HEAD)
+      #     if [[ $COMMIT_MSG == *"[major]"* ]]; then
+      #       echo "major"
+      #     elif [[ $COMMIT_MSG == *"[minor]"* ]]; then
+      #       echo "minor"
+      #     else
+      #       echo "patch"
+      #     fi
         env:
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
