@@ -20,7 +20,7 @@ jobs:
         run: echo ::set-output name=VERSION::$(npm version --parse patch)
 
       - name: Bump version
-        uses: gr2m/semantic-release@v1
+        uses: gr2m/semantic-release@v3
         with:
           assets: package.json
           release: major,minor,patch
