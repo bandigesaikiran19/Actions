@@ -15,29 +15,27 @@ jobs:
       - name: Install dependencies
         run: npm install || yarn install
 
-      - name: Get current version
-        id: get_version
-        run: echo ::set-output name=VERSION::$(npm version --parse patch)
-
-      - name: Bump version
-        uses: gr2m/semantic-release@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          assets: package.json
-          release: major,minor,patch
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          node-version: '14'
+
+      - name: Semantic Release
+        uses: semantic-release/action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate build metadata
         if: always() # Run this step always, regardless of previous steps' outcomes
         run: echo "## Build ${{ github.run_id }}" >> $GITHUB_EVENT_NAME.log
 
       - name: Push changes
-        if: steps.get_version.outputs.VERSION != steps.get_version.outputs.VERSION
+        if: always() && steps.semantic_release.outputs.published == 'true'
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
           git add .
-          git commit -m "Bump version to ${{ steps.get_version.outputs.VERSION }}"
+          git commit -m "Bump version"
           git push origin HEAD:main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
