@@ -17,5 +17,12 @@ jobs:
         with:
           go-version: '1.16'
 
+      - name: Check if go.mod exists
+        run: test -f go.mod || echo "go.mod not found"
+
+      - name: Initialize Go module
+        if: steps.check_mod.outputs.stdout == 'go.mod not found'
+        run: go mod init example.com/myproject
+
       - name: Install dependencies
         run: go mod tidy
