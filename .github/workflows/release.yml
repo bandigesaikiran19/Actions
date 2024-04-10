@@ -35,7 +35,7 @@ jobs:
 
       - name: Bump version to minor
         if: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'minor' }}
-        uses: anothrNick/github-tag-action@v1.2  # Updated action version
+        uses: anothrNick/github-tag-action@v1  # Updated action version
         with:
           tag_name: v${{ steps.read_version_bump.outputs.VERSION_BUMP }}
           tag_prefix: v  # Consistent prefix
@@ -43,7 +43,7 @@ jobs:
 
       - name: Bump version to patch
         if: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'patch' }}
-        uses: anothrNick/github-tag-action@v1.2  # Updated action version
+        uses: anothrNick/github-tag-action@v1  # Updated action version
         with:
           tag_name: v${{ steps.read_version_bump.outputs.VERSION_BUMP }}
           tag_prefix: v  # Consistent prefix
@@ -51,8 +51,8 @@ jobs:
 
       - name: Bump version to default
         if: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'none' }}
-        uses: anothrNick/github-tag-action@v1.2  # Updated action version
+        uses: anothrNick/github-tag-action@v1  # Updated action version
         with:
           tag_name: v0.0.1
           tag_prefix: v  # Consistent prefix
-          token: ${{ secrets.GITHUB_TOKEN }}  # Access token
+          token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
