@@ -54,10 +54,8 @@ jobs:
         id: version
         uses: anothrNick/github-tag-action@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_prefix: v
-          tags: true
-          bump: ${{ steps.read_version_bump.outputs.VERSION_BUMP }}
+          entryPoint: tag
+          args: --tag-prefix v --bump minor
 
       - name: Set output version
         run: echo "VERSION=${{ steps.version.outputs.new_tag }}" >> $GITHUB_ENV
