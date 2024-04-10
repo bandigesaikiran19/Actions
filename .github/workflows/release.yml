@@ -1,55 +1,58 @@
-name: Auto Tag my Application
+name: Semantic Versioning
 
 on:
   push:
     branches:
       - main
 
-concurrency:
-  production
-
 jobs:
-  patch:
+  bump-version:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Get last commit message
+        id: commit_message
+        run: echo "::set-output name=message::$(git log --format=%B -n 1 HEAD)"
+
+      - name: Determine version bump
+        id: version_bump
+        run: |
+          COMMIT_MESSAGE=$(echo "${{ steps.commit_message.outputs.message }}")
+          if [[ "$COMMIT_MESSAGE" =~ ^feat ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^fix ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^perf ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^docs ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^style ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^refactor ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^test ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^build ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^ci ]]; then
+            echo "::set-output name=bump::patch"
+          elif [[ "$COMMIT_MESSAGE" =~ ^chore ]]; then
+            echo "::set-output name=bump::patch"
+          else
+            echo "::set-output name=bump::none"
+          fi
+
+      - name: Bump version
+        id: version
+        uses: anothrNick/github-tag-action@v1
         with:
-          fetch-depth: '0'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag_prefix: v
+          tags: true
+          bump: ${{ steps.version_bump.outputs.bump }}
 
-      - name: Get next tag version (dry run)
-        id: taggerDryRun
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-          DRY_RUN: true
+      - name: Set output version
+        run: echo "VERSION=${{ steps.version.outputs.new_tag }}" >> $GITHUB_ENV
 
-      - name: Display next tag version
-        run: |
-          echo "The next tag version will be: ${{ steps.taggerDryRun.outputs.new_tag }}"
-
-      - name: Display current tag
-        run: |
-          echo "The current tag is: ${{ steps.taggerDryRun.outputs.tag }}"
-
-      - name: Display version increment
-        run: |
-          echo "The version increment was: ${{ steps.taggerDryRun.outputs.part }}"
-
-      # DO MY BUILD HERE
-      # IN CASE OF FAILURE, THE STEP BELOW WILL NOT RUN.
-
-      - name: Tag the final version
-        id: taggerFinal
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
-
-# Environment files to set outputs
-env:
-  NEXT_TAG_VERSION: ${{ steps.taggerDryRun.outputs.new_tag }}
-  CURRENT_TAG_VERSION: ${{ steps.taggerDryRun.outputs.tag }}
-  VERSION_INCREMENT: ${{ steps.taggerDryRun.outputs.part }}
