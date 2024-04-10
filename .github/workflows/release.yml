@@ -46,7 +46,9 @@ jobs:
 
       - name: Read version bump
         id: read_version_bump
-        run: echo "$(cat version_bump.txt)" >> $GITHUB_ENV
+        run: |
+          VERSION_BUMP=$(cat version_bump.txt)
+          echo "VERSION_BUMP=${VERSION_BUMP//$'\n'/ }" >> $GITHUB_ENV
 
       - name: Bump version
         id: version
