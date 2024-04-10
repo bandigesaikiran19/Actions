@@ -9,8 +9,7 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3  # Improved checkout action version
 
       - name: Get last commit message
         id: commit_message
@@ -22,23 +21,7 @@ jobs:
           COMMIT_MESSAGE=$(cat commit_message.txt)
           if [[ "$COMMIT_MESSAGE" =~ ^feat ]]; then
             echo "minor" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^fix ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^perf ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^docs ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^style ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^refactor ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^test ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^build ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^ci ]]; then
-            echo "patch" >> version_bump.txt
-          elif [[ "$COMMIT_MESSAGE" =~ ^chore ]]; then
+          elif [[ "$COMMIT_MESSAGE" =~ ^fix|perf|docs|style|refactor|test|build|ci|chore ]]; then
             echo "patch" >> version_bump.txt
           else
             echo "none" >> version_bump.txt
@@ -50,13 +33,11 @@ jobs:
           VERSION_BUMP=$(cat version_bump.txt)
           echo "VERSION_BUMP=${VERSION_BUMP//$'\n'/ }" >> $GITHUB_ENV
 
-      - name: Bump version
-        id: version
-        uses: anothrNick/github-tag-action@v1
+      - name: Bump version (with proper inputs)
+        uses: anothrNick/github-tag-action@v1.2  # Updated action version
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_prefix: v
-          bump: ${{ steps.read_version_bump.outputs.VERSION_BUMP }}
+          tag_name: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'none' ? 'v0.0.1' : format('{0}.{1}.{2}', steps.version.outputs.major_version, steps.version.outputs.minor_version, steps.version.outputs.patch_version) }}  # Conditional tag creation with default
+          tag_prefix: v  # Consistent prefix
+          token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
 
-      - name: Set output version
-        run: echo "VERSION=${{ steps.version.outputs.new_tag }}" >> $GITHUB_ENV
+      - name: Set output version  # Redundant, removed
