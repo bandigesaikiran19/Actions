@@ -28,7 +28,7 @@ jobs:
           fi
 
       - name: Display version bump
-        run: echo "Version bump detected:$(cat version_bump.txt)"
+        run: echo "Version bump detected: $(cat version_bump.txt)"
 
       - name: Read version bump
         id: read_version_bump
@@ -76,6 +76,3 @@ jobs:
 
       - name: Run Release Drafter
         uses: release-drafter/release-drafter@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          config-file: .github/release-drafter.yml
