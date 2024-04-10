@@ -59,3 +59,23 @@ jobs:
           tag_name: v0.0.1
           tag_prefix: v  # Consistent prefix
           token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
+
+  release-drafter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Release Drafter
+        uses: release-drafter/release-drafter@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          config-file: .github/release-drafter.yml
