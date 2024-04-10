@@ -46,17 +46,14 @@ jobs:
 
       - name: Read version bump
         id: read_version_bump
-        run: echo "::set-output name=bump::$(cat version_bump.txt)"
+        run: echo "$(cat version_bump.txt)" >> $GITHUB_ENV
 
       - name: Bump version
         id: version
         uses: anothrNick/github-tag-action@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag_prefix: v
-          tags: true
-          bump: ${{ steps.read_version_bump.outputs.bump }}
+          entryPoint: tag
+          args: --tag-prefix v --tags --bump minor
 
       - name: Set output version
         run: echo "VERSION=${{ steps.version.outputs.new_tag }}" >> $GITHUB_ENV
-
