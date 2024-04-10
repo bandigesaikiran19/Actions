@@ -36,6 +36,6 @@ jobs:
       - name: Bump version (with proper inputs)
         uses: anothrNick/github-tag-action@v1.2  # Updated action version
         with:
-          tag_name: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'none' ? 'v0.0.1':'v' + steps.read_version_bump.outputs.VERSION_BUMP  }} 
+          tag_name: ${{ if ne(steps.read_version_bump.outputs.VERSION_BUMP, 'none') }}v${{ steps.read_version_bump.outputs.VERSION_BUMP }}${{ else }}v0.0.1${{ end }}  # Conditional tag creation with default
           tag_prefix: v  # Consistent prefix
           token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
