@@ -27,6 +27,9 @@ jobs:
             echo "none" >> version_bump.txt
           fi
 
+      - name: Display version bump
+        run: echo "Version bump detected: ${{ steps.version_bump.outputs.VERSION_BUMP }}"
+
       - name: Read version bump
         id: read_version_bump
         run: |
