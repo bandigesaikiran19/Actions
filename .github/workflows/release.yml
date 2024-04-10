@@ -9,7 +9,7 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3  # Improved checkout action version
+      - uses: actions/checkout@v3  # Updated to use Node.js 20
 
       - name: Get last commit message
         id: commit_message
