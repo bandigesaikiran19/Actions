@@ -14,35 +14,39 @@ jobs:
 
       - name: Get last commit message
         id: commit_message
-        run: echo "::set-output name=message::$(git log --format=%B -n 1 HEAD)"
+        run: echo "$(git log --format=%B -n 1 HEAD)" >> commit_message.txt
 
       - name: Determine version bump
         id: version_bump
         run: |
-          COMMIT_MESSAGE=$(echo "${{ steps.commit_message.outputs.message }}")
+          COMMIT_MESSAGE=$(cat commit_message.txt)
           if [[ "$COMMIT_MESSAGE" =~ ^feat ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^fix ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^perf ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^docs ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^style ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^refactor ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^test ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^build ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^ci ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           elif [[ "$COMMIT_MESSAGE" =~ ^chore ]]; then
-            echo "::set-output name=bump::patch"
+            echo "patch" >> version_bump.txt
           else
-            echo "::set-output name=bump::none"
+            echo "none" >> version_bump.txt
           fi
+
+      - name: Read version bump
+        id: read_version_bump
+        run: echo "::set-output name=bump::$(cat version_bump.txt)"
 
       - name: Bump version
         id: version
@@ -51,7 +55,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tag_prefix: v
           tags: true
-          bump: ${{ steps.version_bump.outputs.bump }}
+          bump: ${{ steps.read_version_bump.outputs.bump }}
 
       - name: Set output version
         run: echo "VERSION=${{ steps.version.outputs.new_tag }}" >> $GITHUB_ENV
