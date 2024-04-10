@@ -33,9 +33,26 @@ jobs:
           VERSION_BUMP=$(cat version_bump.txt)
           echo "VERSION_BUMP=${VERSION_BUMP//$'\n'/ }" >> $GITHUB_ENV
 
-      - name: Bump version (with proper inputs)
+      - name: Bump version to minor
+        if: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'minor' }}
         uses: anothrNick/github-tag-action@v1.2  # Updated action version
         with:
-          tag_name: ${{ if ne(steps.read_version_bump.outputs.VERSION_BUMP, 'none') }}v${{ steps.read_version_bump.outputs.VERSION_BUMP }}${{ else }}v0.0.1${{ end }}  # Conditional tag creation with default
+          tag_name: v${{ steps.read_version_bump.outputs.VERSION_BUMP }}
           tag_prefix: v  # Consistent prefix
           token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
+
+      - name: Bump version to patch
+        if: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'patch' }}
+        uses: anothrNick/github-tag-action@v1.2  # Updated action version
+        with:
+          tag_name: v${{ steps.read_version_bump.outputs.VERSION_BUMP }}
+          tag_prefix: v  # Consistent prefix
+          token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
+
+      - name: Bump version to default
+        if: ${{ steps.read_version_bump.outputs.VERSION_BUMP == 'none' }}
+        uses: anothrNick/github-tag-action@v1.2  # Updated action version
+        with:
+          tag_name: v0.0.1
+          tag_prefix: v  # Consistent prefix
+          token: ${{ secrets.GITHUB_TOKEN }}  # Access token
