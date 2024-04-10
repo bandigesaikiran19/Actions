@@ -40,4 +40,3 @@ jobs:
           tag_prefix: v  # Consistent prefix
           token: ${{ secrets.GITHUB_TOKEN }}  # Access token secured
 
-# Removed redundant step
